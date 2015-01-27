@@ -17,83 +17,65 @@ documentation out of [reStructured Text](http://docutils.sf.net/rst.html) source
     [Celery](http://docs.celeryproject.org/en/latest/index.html) (documentation is also on [github](https://github.com/ask/celery/tree/master/docs)).
 3. Add the sphinx maven plugin to your `pom.xml`:
 
-				<reporting>
-				  <plugins>
-				    <plugin>
-				      <groupId>org.apache.maven.plugins</groupId>
-				      <artifactId>maven-project-info-reports-plugin</artifactId>
-				      <version>2.4</version>
-				      <reportSets>
-				        <reportSet>
-				          <reports></reports>
-				        </reportSet>
-				      </reportSets>
-				    </plugin>
-				    <plugin>
-				      <groupId>org.tomdz.maven</groupId>
-				      <artifactId>sphinx-maven-plugin</artifactId>
-				      <version>1.0.2</version>
-				    </plugin>
-				  </plugins>
-				</reporting>
+				<build>
+                        <plugins>
+                            <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-site-plugin</artifactId>
+                                <version>3.4</version>
+                                <configuration>
+                                    <reportPlugins>
+                                        <plugin>
+                                            <groupId>org.apache.maven.plugins</groupId>
+                                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                                            <version>2.8</version>
+                                            <reportSets>
+                                                <reportSet>
+                                                    <reports></reports>
+                                                </reportSet>
+                                            </reportSets>
+                                        </plugin>
+                                        <plugin>
+                                            <groupId>com.stratio.maven</groupId>
+                                            <artifactId>sphinx-maven-plugin</artifactId>
+                                            <version>2.0.0</version>
+                                            <configuration>
+                                                <builders>
+                                                    <entry>singlehtml</entry>
+                                                </builders>
+                                                <resources>
+                                                    <resource>
+                                                        <directory>src/site/sphinx</directory>
+                                                        <filtering>true</filtering>
+                                                        <includes>
+                                                            <include>conf.py</include>
+                                                        </includes>
+                                                    </resource>
+                                                </resources>
+                                            </configuration>
+                                        </plugin>
+                                    </reportPlugins>
+                                </configuration>
+                            </plugin>
+                        </plugins>
+                    </build>
 
     It is important that you set the `reportSet` attribute of the `project-info-reports` plugin to an empty set of `reports`. If not
     then the default `about` report will be generated which conflicts with the `sphinx-maven` plugin.
-
-    Maven 3 changes how reporting plugins are specified. A `profile` can be used to generate a `pom.xml` that can be used with both Maven 2
-    and Maven 3:
-
-                <profiles>
-                  <profile>
-                    <id>maven-3</id>
-                    <activation>
-                      <file>
-                         <!--  This employs that the basedir expression is only recognized by Maven 3.x (see MNG-2363) -->
-                        <exists>${basedir}</exists>
-                      </file>
-                    </activation>
-                    <build>
-                      <plugins>
-                        <plugin>
-                          <groupId>org.apache.maven.plugins</groupId>
-                          <artifactId>maven-site-plugin</artifactId>
-                          <version>3.0-beta-3</version>
-                          <configuration>
-                            <reportPlugins>
-                              <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-project-info-reports-plugin</artifactId>
-                                <version>2.2</version>
-                                <reportSets>
-                                  <reportSet>
-                                    <reports></reports>
-                                  </reportSet>
-                                </reportSets>
-                              </plugin>
-                              <plugin>
-                                <groupId>org.tomdz.maven</groupId>
-                                <artifactId>sphinx-maven-plugin</artifactId>
-                                <version>1.0.2</version>
-                              </plugin>
-                            </reportPlugins>
-                          </configuration>
-                        </plugin>
-                      </plugins>        
-                    </build>
-                  </profile>
-                </profiles>
-
-    The profile will only be activated if Maven 3 is used to generate the site. For more details about Maven 3 and the site
-    plugin see https://cwiki.apache.org/MAVEN/maven-3x-and-site-plugin.html and
-    http://whatiscomingtomyhead.wordpress.com/2011/06/05/maven-3-site-plugin-how-to/
 
 4.  Generate the documentation by running
 
         mvn site
 
-    This will generate the documentation in the `target/site` folder.
+    This will generate the documentation in the `target/site/[builder]` folder.
+
+## CHANGELOG
+#### 2.0.0
+- Refactor all the code to easy add new improvements.
+- Updated all libraries into pom file.
+- Added resources filtering. Now you can put in your conf.py file this: `version = '${project.version}'`
 
 ## TODOs
-
-* Add a goal that bootstraps the documentation
-* Document integration with other reporting plugins
+- PDF generator only works with jpg not with png.
+- Update Sphinx version.
+- Improve Sphinx jar generator scripts.
